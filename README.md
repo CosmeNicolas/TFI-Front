@@ -1,6 +1,6 @@
 # Gestor GIS — Frontend
 
-Frontend de la plataforma institucional **Gestor GIS — Gestión y Seguimiento de Obras San Juan**. Esta versión es el scaffolding de la Etapa 1. No hay login, visor GIS ni datos de negocio.
+Frontend de la plataforma institucional **Gestor GIS — Gestión y Seguimiento de recursos **. Esta versión es el scaffolding de la Etapa 1. No hay login, visor GIS ni datos de negocio.
 
 ## 1. Nombre y descripción
 
