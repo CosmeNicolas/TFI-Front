@@ -53,7 +53,7 @@ describe("cliente HTTP", () => {
     } satisfies Partial<ErrorApi>);
   });
 
-  it("no envía el cuerpo cuando no hay payload", async () => {
+  it("camino exitoso: no envía el cuerpo cuando no hay payload", async () => {
     process.env.NEXT_PUBLIC_API_URL = "http://localhost:3001/api/v1";
     const fetchMock = vi.fn().mockResolvedValue(
       new Response(JSON.stringify({ estado: "ok" }), {
@@ -76,5 +76,47 @@ describe("cliente HTTP", () => {
         body: undefined,
       }),
     );
+  });
+
+  it("caso límite: acepta una respuesta 204 sin cuerpo", async () => {
+    process.env.NEXT_PUBLIC_API_URL = "http://localhost:3001/api/v1";
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(new Response(null, { status: 204 })),
+    );
+
+    await expect(solicitarJson("/health")).resolves.toBeUndefined();
+  });
+
+  it("condición de error: traduce un fallo de red", async () => {
+    process.env.NEXT_PUBLIC_API_URL = "http://localhost:3001/api/v1";
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockRejectedValue(new TypeError("Failed to fetch")),
+    );
+
+    await expect(solicitarJson("/health")).rejects.toMatchObject({
+      name: "ErrorApi",
+      codigo: 0,
+      mensajes: ["No se pudo contactar al backend"],
+    });
+  });
+
+  it("condición de error: interpreta 401 con mensaje de sesión", async () => {
+    process.env.NEXT_PUBLIC_API_URL = "http://localhost:3001/api/v1";
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        new Response(JSON.stringify({ error: "unauthorized" }), {
+          status: 401,
+          headers: { "Content-Type": "application/json" },
+        }),
+      ),
+    );
+
+    await expect(solicitarJson("/protegido")).rejects.toMatchObject({
+      codigo: 401,
+      mensajes: ["La sesión no es válida o expiró"],
+    });
   });
 });

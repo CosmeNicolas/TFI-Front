@@ -14,7 +14,9 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:unit": "vitest run",
+    "test:watch": "vitest",
+    "test:all": "vitest run"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
